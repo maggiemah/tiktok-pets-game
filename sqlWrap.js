@@ -19,15 +19,15 @@ let cmd = " SELECT name FROM sqlite_master WHERE type='table' AND name='VideoTab
 
 db.get(cmd, function (err, val) {
   if (val == undefined) {
-        console.log("No database file - creating one");
-        createVideoTable();
+    console.log("No database file - creating one");
+    createActivityTable();
   } else {
-        console.log("Database file found");
+    console.log("Database file found");
   }
 });
 
 // called to create table if needed
-function createVideoTable() {
+function createActivityTable() {
   // explicitly declaring the rowIdNum protects rowids from changing if the 
   // table is compacted; not an issue here, but good practice
   const cmd = 'CREATE TABLE VideoTable (rowIdNum INTEGER PRIMARY KEY, url TEXT, nickname TEXT, userid TEXT, flag INTEGER)';
@@ -39,18 +39,17 @@ function createVideoTable() {
     }
   });
 }
-
 // wrap all database commands in promises
 db.run = util.promisify(db.run);
 db.get = util.promisify(db.get);
 db.all = util.promisify(db.all);
 
+
 // empty all data from db
 db.deleteEverything = async function() {
   await db.run("delete from VideoTable");
-  // vacuum is an SQL command
-  await db.run("vacuum");
+  db.run("vacuum");
 }
 
-// allow code in other server .js files to use the db object
+// allow code in index.js to use the db object
 module.exports = db;
